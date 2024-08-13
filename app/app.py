@@ -3,7 +3,7 @@ current_dir = os.getcwd()
 dir_to_add = pathlib.Path(current_dir).parent.as_posix()
 sys.path.append(dir_to_add)
 sys.path.append(f'{current_dir}/pages')
-sys.path.append(f'{dir_to_add}/bots')
+sys.path.append(f'{current_dir}/bots')
 sys.path.append(f'{dir_to_add}/app')
 
 import frontend
