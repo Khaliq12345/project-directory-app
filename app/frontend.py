@@ -27,5 +27,8 @@ def init(fastapi_app: FastAPI) -> None:
         scrape_page.main()
         
     ui.run_with(
-        fastapi_app
+        fastapi_app,
+        title='ProjectDirectory',
+        favicon='🎯',
+        reconnect_timeout=10
     )
