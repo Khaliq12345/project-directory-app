@@ -1,0 +1,7 @@
+poetry.lock
+pyproject.toml
+Test
+__pycache__
+.venv
+.pytest_cache
+*.ipynb
