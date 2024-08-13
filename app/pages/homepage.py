@@ -107,13 +107,13 @@ class HomePage:
                             .on_value_change(
                             lambda e, key=filter_name: set_value(self, e.value, key)
                         )
-                
-                ui.button('Search').on_click(
-                    self.start_filtering
-                )
-                ui.button('Clear').on_click(
-                    self.clear_filters
-                )
+                with ui.button_group().props('unelevated').classes('w-full'):
+                    ui.button('Search').on_click(
+                        self.start_filtering
+                    ).classes('w-full')
+                    ui.button('Clear').on_click(
+                        self.clear_filters
+                    ).classes('w-full')
         
     def listing_ui(self):
         self.listing_box.clear()
@@ -137,13 +137,10 @@ class HomePage:
         ui.query('body').style('background-color: #bfc2c7;')
         self.body = ui.query('body').element
         self.filter_ui()
-        # self.spinner = ui.spinner(type='orbit', size='lg').classes('flex w-full justify-center')
-        # self.spinner.visible = False
         self.listing_box = ui.row().classes('w-full h-full grid lg:grid-cols-6 grid-cols-1 bg-white')
         self.pagination_box = ui.element('div').classes('flex w-full justify-center')
         self.stmt = select(app_model.Project)
         dataloader(self, self.stmt)
         self.pagination_ui()
-        #self.total_data = 100 #change later
 
         
