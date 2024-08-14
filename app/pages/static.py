@@ -1,5 +1,5 @@
 
-filter_names = ['directory', 'status', 'country', 'sector']
+filter_names = ['directory', 'status', 'country', 'sector', 'date']
 
 directories = ['Adb.fr', 'Afd.fr', 'Caf.com', 'Eib.org', 
             'Iadb.org', 'Ifad.org', 'MapAfrica Afdb.org',

@@ -26,12 +26,15 @@ def adb_parser(soup: HTMLParser, db: list):
                     country, sectors = None, None
                 case [_]:
                     country, sectors = None, None
+        date = card.css_first('time')
+        date = date.attributes['datetime'] if date else None
         project_data = {
             'title': title,
             'project_url': project_url,
             'sectors': sectors,
             'countries': country,
-            'directory': 'Adb.fr'
+            'directory': 'Adb.fr',
+            'date': date
         }
         project_model = model.Project(**project_data)
         db.append(json.loads(project_model.model_dump_json()))

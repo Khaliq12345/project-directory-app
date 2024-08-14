@@ -1,5 +1,5 @@
 import adb, afd, caf, eib, iadb, ifad, mapafrica, opec, worldbank
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, DATE
 import pandas as pd
 import os, pathlib, sys
 current_dir = os.getcwd()
@@ -25,7 +25,7 @@ def save_data(all_projects):
     dataframe = pd.DataFrame(all_projects)
     dataframe.drop_duplicates(subset=['title'], inplace=True)
     with engine.connect() as con:
-        dataframe.to_sql('project', con=con, index=False, if_exists='replace')
+        dataframe.to_sql('project', con=con, index=False, if_exists='replace', dtype={'date': DATE})
         print("DONE!")
         
 if __name__ == '__main__':

@@ -4,13 +4,14 @@ import pandas as pd
 import json
 
 def table_parser(tbl: pd.DataFrame, db: list):
-    tbl = tbl[["Project Number", "Country", "Sector", "Title", "Project Status"]]
+    tbl = tbl[["Project Number", "Country", "Sector", "Title", "Project Status", "Approval Date"]]
     tbl = tbl.rename(columns={
         "Project Number": "project_id",
         "Country": "countries",
         "Sector": "sector",
         "Title": "title",
-        "Project Status": "status"
+        "Project Status": "status",
+        'Approval Date': 'date',
     })
     tbl['project_url'] = tbl['project_id'].map(lambda x: f'https://www.iadb.org/en/project/{x}')
     tbl['directory'] = 'Iadb.org'

@@ -10,6 +10,7 @@ def worldbank_parser(json_data, db:list):
         status = jdata.get('status')
         countries = jdata.get('countryname')
         title = jdata.get('project_name')
+        date = jdata.get('boardapprovaldate')
         project_url = f'https://projects.worldbank.org/en/projects-operations/project-detail/{pid}'
         sectors = [tag['name'] for tag in jdata['theme_list']] if jdata.get('theme_list') else None
         sectors = '; '.join(sectors) if sectors else None
@@ -19,7 +20,8 @@ def worldbank_parser(json_data, db:list):
             'sectors': sectors,
             'title': title,
             'project_url': project_url,
-            'directory': 'World Bank'
+            'directory': 'World Bank',
+            'date': date
         }
         project_model = model.Project(**project_data)
         db.append(json.loads(project_model.model_dump_json()))

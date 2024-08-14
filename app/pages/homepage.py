@@ -1,6 +1,6 @@
 from nicegui import ui
 from static import *
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, and_
 import pandas as pd
 import app_model
 from threading import Thread
@@ -14,6 +14,33 @@ def make_the_special_query(values, column):
         queries.append(new_q)
     query = '|'.join(queries)
     return query
+
+def date_filter_checker(filter_values, date_str):
+    if filter_values.get(date_str) and len(filter_values.get(date_str)) > 0:
+        return True
+    else:
+        return False
+
+def make_date_query(filter_values):
+    match [date_filter_checker(filter_values, 'date_from'), date_filter_checker(filter_values, 'date_to')]:
+        case [True, True]:
+            q = and_(
+                app_model.Project.date >= filter_values['date_from'],
+                app_model.Project.date <= filter_values['date_to'],
+            )
+            return q
+        case [True, False]:
+            q = and_(
+                app_model.Project.date >= filter_values['date_from'],
+            )
+            return q    
+        case [False, True]:
+            q = and_(
+                app_model.Project.date <= filter_values['date_to'],
+            )
+            return q
+        case [False, False]:
+            return False
 
 def set_value(self, value, key):
     self.filter_values[key] = value
@@ -74,6 +101,14 @@ class HomePage:
                         self.stmt = self.stmt.where(eval(query))
                     case 'directory':
                         self.stmt = self.stmt.where(app_model.Project.directory.in_(self.filter_values[x]))
+                    case 'date_from':
+                        date_query = make_date_query(self.filter_values)
+                        if date_query != False:
+                            self.stmt = self.stmt.where(date_query)
+                    case 'date_to':
+                        date_query = make_date_query(self.filter_values)
+                        if date_query != False:
+                            self.stmt = self.stmt.where(date_query)
         dataloader(self, self.stmt)
 
     def get_next_data(self, num):
@@ -101,7 +136,17 @@ class HomePage:
                             .on_value_change(
                             lambda e, key=filter_name: set_value(self, e.value, key)
                         )
-                    else:   
+                    elif filter_name == 'date':
+                        with ui.row().classes('w-full grid grid-cols-2'):
+                            ui.input("From").props('stack-label outlined type="date"').classes('w-full').\
+                                on_value_change(
+                                    lambda e: set_value(self, e.value, 'date_from')
+                                )
+                            ui.input("To").props('stack-label outlined type="date"').classes('w-full').\
+                                on_value_change(
+                                    lambda e: set_value(self, e.value, 'date_to')
+                                )
+                    else:
                         ui.select(options=[], label=filter_name.title(), multiple=True, new_value_mode='add-unique')\
                         .props('hide-dropdown-icon use-input use-chips')\
                             .on_value_change(
@@ -130,6 +175,7 @@ class HomePage:
                             ui.label(f"Sectors - {row['sectors']}").classes('text-h8 font-mono')
                             ui.label(f"Status - {row['status']}").classes('text-h8 font-mono')
                             ui.label(f"Directory - {row['directory']}").classes('text-h8 font-mono')
+                            ui.label(f"Date - {row['date']}").classes('text-h8 font-mono')
                             
                     #ui.separator()
             

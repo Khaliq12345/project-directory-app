@@ -25,7 +25,7 @@ def ifad_parser(soup, db:list):
                     'countries': country,
                     'status': 'Planning',
                     'project_url': project_url,
-                    'directory': 'Ifad.org'
+                    'directory': 'Ifad.org',
                 }
                 project_model = model.Project(**project_data)
                 db.append(json.loads(project_model.model_dump_json()))

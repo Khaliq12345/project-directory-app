@@ -37,7 +37,7 @@ def eib_data_parser(dt, db: list):
     sectors = '; '.join(sectors)
     title = helper.key_checker(dt['title'], dt)
     release_date = helper.key_checker(dt['startDate'], dt)
-    release_date = parse(str(release_date)).strftime("%y-%m-%d") if release_date else None 
+    release_date = str(release_date) if release_date else None
     project_id = helper.key_checker(dt['id'], dt)
     project_url = f'https://www.eib.org/en/projects/pipelines/all/{project_id}'
     project_data = {
@@ -46,7 +46,8 @@ def eib_data_parser(dt, db: list):
         'sectors': sectors,
         'title': title,
         'project_url': project_url,
-        'directory': 'Eib.org'
+        'directory': 'Eib.org',
+        'date': release_date
     }
     project_model = model.Project(**project_data)
     db.append(json.loads(project_model.model_dump_json()))

@@ -21,6 +21,7 @@ def mapafrica_parser(json_data, db: list):
         title = x.get('title')
         country = x.get('country')
         status = x.get('activity_status')
+        date = x.get('activity_date_planned_start')
         if status == '1':
             status = 'Approved'
         elif status == '2':
@@ -34,7 +35,8 @@ def mapafrica_parser(json_data, db: list):
             'status': status,
             'sectors': sectors,
             'project_url': project_url,
-            'directory': 'MapAfrica Afdb.org'
+            'directory': 'MapAfrica Afdb.org',
+            'date': date,
         }
         project_model = model.Project(**project_data)
         db.append(json.loads(project_model.model_dump_json()))

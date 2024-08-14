@@ -4,7 +4,7 @@ import json
 import httpx
 from selectolax.parser import HTMLParser
 
-def afd_parser(soup, db: list):
+def afd_parser(soup: HTMLParser, db: list):
     cards = soup.css('.ctsearch-result-item')
     for card in cards:
         title = card.css_first('h3')
@@ -23,12 +23,15 @@ def afd_parser(soup, db: list):
         funding = card.css_first('.ctsearch-result-item-funding-type')
         if funding:
             funding = funding.text(strip=True)
+        date = card.css_first('time')
+        date = date.attributes['datetime'] if date else None
         project_data = {
             'title': title,
             'project_url': project_url,
             'sectors': sectors,
             'countries': country,
-            'directory': 'Afd.fr'
+            'directory': 'Afd.fr',
+            'date': date
         }
         project_model = model.Project(**project_data)
         db.append(json.loads(project_model.model_dump_json()))

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import mapped_column
-from sqlalchemy import Text, ARRAY
+from sqlalchemy import Text, ARRAY, DATE
 
 class Base(DeclarativeBase):
     pass
@@ -14,3 +14,4 @@ class Project(Base):
     status = mapped_column(Text)
     project_url = mapped_column(Text)
     directory = mapped_column(Text)
+    date = mapped_column(DATE)

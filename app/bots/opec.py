@@ -8,7 +8,7 @@ def opec_parser(soup: HTMLParser, db: list):
     cards = soup.css('.list-item')
     for card in cards:
         title = card.css_first('h4').text()
-        status, sector, country = None, None, None
+        status, sector, country, date = None, None, None, None
         for x in card.css('.line'):
             if 'Status' in x.text():
                 status = x.text(strip=True).replace('Status', '')
@@ -16,12 +16,15 @@ def opec_parser(soup: HTMLParser, db: list):
                 sector = x.text(strip=True).replace('Focus Area', '')
             if 'Country' in x.text():
                 country = x.text(strip=True).replace('Country', '')
+            if 'Approved' in x.text():
+                date = x.text(strip=True).replace('Approved', '')
         project_data = {
             'title': title,
             'status': status,
             'countries': country,
             'sectors': sector,
-            'directory': 'Opec'
+            'directory': 'Opec',
+            'date': date
         }
         project_model = model.Project(**project_data)
         db.append(json.loads(project_model.model_dump_json()))

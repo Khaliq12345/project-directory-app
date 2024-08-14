@@ -4,7 +4,7 @@ import json
 import httpx
 from selectolax.parser import HTMLParser
 
-def caf_parser(soup, db: list):
+def caf_parser(soup: HTMLParser, db: list):
     cards = soup.css('.row.justify-content-center.caf_container_list.my-5')
     for card in cards:
         country = card.css_first('.caf_etiqueta2.caf_color_home_int_3')
@@ -13,11 +13,14 @@ def caf_parser(soup, db: list):
         title = card.css_first('.caf_etiqueta1.pr-lg-4 span')
         if title:
             title = title.attributes['title']
+        date = card.css_first('p.caf_fechas')
+        date = date.text(strip=True).replace('Last update', '').replace(':', '') if date else None
         project_data = {
             'title': title,
             'countries': country,
             'status': 'Approved',
-            'directory': 'Caf.com'
+            'directory': 'Caf.com',
+            'date': date
         }
         project_model = model.Project(**project_data)
         db.append(json.loads(project_model.model_dump_json()))
