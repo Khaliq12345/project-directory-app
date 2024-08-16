@@ -180,10 +180,10 @@ class HomePage:
                     #ui.separator()
             
     def main(self):
-        ui.query('body').style('background-color: #bfc2c7;')
+        ui.query('body').style('background-color: #F1DEC6;')
         self.body = ui.query('body').element
         self.filter_ui()
-        self.listing_box = ui.row().classes('w-full h-full grid lg:grid-cols-6 grid-cols-1 bg-white')
+        self.listing_box = ui.row().classes('w-full h-full grid lg:grid-cols-6 grid-cols-1')
         self.pagination_box = ui.element('div').classes('flex w-full justify-center')
         self.stmt = select(app_model.Project)
         dataloader(self, self.stmt)
