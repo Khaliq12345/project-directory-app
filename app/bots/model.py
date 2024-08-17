@@ -8,7 +8,7 @@ class Project(BaseModel):
     sectors: str | None = None
     project_url: str | None = None
     directory: str
-    date: str = None
+    date: str | None = None
     
     @model_validator(mode='after')
     def validate_the_model(self):

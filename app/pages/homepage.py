@@ -169,8 +169,8 @@ class HomePage:
                 for idx, row in self.dataframe.iterrows():
                     with ui.card().classes('bg-transparent').props('flat bordered'):
                         with ui.card_section():
-                            with ui.link(target=row['project_url'], new_tab=True):
-                                ui.label(row['title']).classes('text-h6')
+                            with ui.link(target=row['project_url'], new_tab=True).classes('no-underline'):
+                                ui.label(row['title']).classes('text-h6 text-white')
                             ui.label(f"Country - {row['countries']}").classes('text-h8 font-mono')
                             ui.label(f"Sectors - {row['sectors']}").classes('text-h8 font-mono')
                             ui.label(f"Status - {row['status']}").classes('text-h8 font-mono')
@@ -180,7 +180,7 @@ class HomePage:
                     #ui.separator()
             
     def main(self):
-        ui.query('body').style('background-color: #F1DEC6;')
+        ui.query('body').style('background-color: #FF9100;')
         self.body = ui.query('body').element
         self.filter_ui()
         self.listing_box = ui.row().classes('w-full h-full grid lg:grid-cols-6 grid-cols-1')
