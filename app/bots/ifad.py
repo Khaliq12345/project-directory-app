@@ -3,6 +3,7 @@ import model
 from selectolax.parser import HTMLParser
 import helper as helper
 import json
+from the_retry import retry
 
 def ifad_parser(soup, db:list):
     cards = soup.css('.col-md.table-row.row')
@@ -29,7 +30,8 @@ def ifad_parser(soup, db:list):
                 }
                 project_model = model.Project(**project_data)
                 db.append(json.loads(project_model.model_dump_json()))
-                         
+
+@retry(attempts=5, backoff=2)                       
 def start(db: list):
     session = create_scraper()
     response = session.get('https://www.ifad.org/en/web/operations/projects-and-programmes')
@@ -38,6 +40,8 @@ def start(db: list):
     if response.status_code == 200:
         soup = HTMLParser(response.text)
         ifad_parser(soup, db)
+    else:
+        raise ConnectionError()
 
 def main():
     db = helper.DB()

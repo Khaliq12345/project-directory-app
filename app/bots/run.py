@@ -29,7 +29,7 @@ def save_data(dataframe: pd.DataFrame):
         
 if __name__ == '__main__':
     all_projects = []
-    scripts = ['worldbank']
+    scripts = ['ifad']
     start_scripts(scripts, all_projects)
     df = pd.DataFrame(all_projects)
     save_data(df)
