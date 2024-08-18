@@ -6,4 +6,4 @@ COPY . /app
 
 RUN pip install -r requirements.txt
 
-CMD [ "uvicorn", "app:app", "--port" "4000"]
+CMD ["python3", "app.py"]
