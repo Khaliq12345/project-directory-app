@@ -87,10 +87,10 @@ class Wp:
         
         with ui.column().classes('xl:grid xl:grid-cols-4 w-full'):
             with ui.row().classes('xl:col-start-2 xl:col-span-2 w-full'):
-                with ui.element('div').classes('w-full') as self.api_ui:
+                with ui.element('div').classes('w-full flex justify-center') as self.api_ui:
                     ui.input('API KEY', password=True, password_toggle_button=True)\
-                    .classes('w-full').bind_value(self, 'api_value')
-                    ui.button('Login').on_click(self.check_api).classes('p-2')
+                    .classes('w-full mb-2').bind_value(self, 'api_value')
+                    ui.button('Login').on_click(self.check_api)
                 
                 if app.storage.user.get('logged_in'):
                     if app.storage.user.get('logged_in') == config.api_key:
