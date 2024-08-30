@@ -89,26 +89,31 @@ def parse_text_into_countries(text, date, all_posts: list):
     if len(countries) > 0:
         save_data(countries, countries[0], text, date, all_posts)
         
-def bulk_parse_document(start_date: str, content):
+def bulk_parse_document(end_date: str, content):
     print(f'Parsing document')
     all_posts = []
     to_ignores = ["IN CIS:", "IN ASIA:", "IN MEA:", "IN LATAM:", "Good morning – Time for the daily market update"]
     num = 0
     document = Document(content)
-    for x in document.paragraphs:
+    paragraphs = document.paragraphs
+    paragraphs.reverse()
+    for x in paragraphs:
+        if num == 0:
+            date_str = (timedelta(num) + parse(end_date))
+            date_str = date_str.strftime('%Y-%m-%dT%H:%M:%S')
         to_ignore = False
         if (to_ignores[-1].lower() in x.text.lower()):
-            date_str = (timedelta(num) + parse(start_date))
+            date_str = (timedelta(num) + parse(end_date))
             if date_str.weekday() == 5:
-                num += 2
-                date_str = (timedelta(num) + parse(start_date))
+                num -= 1
+                date_str = (timedelta(num) + parse(end_date))
             elif date_str.weekday() == 6:
-                num += 1
-                date_str = (timedelta(num) + parse(start_date))  
+                num -= 2
+                date_str = (timedelta(num) + parse(end_date))  
+            num -= 1
             date_str = date_str.strftime('%Y-%m-%dT%H:%M:%S')
-            num += 1
         for tg in to_ignores:
-            if tg.lower() in x.text.lower():
+            if (tg.lower() in x.text.lower()) or (len(x.text) < 10) or (x.text.isspace()):
                 to_ignore = True
                 break
         if not to_ignore:
@@ -159,8 +164,8 @@ def send_to_wordpress(post_dict: list, categories_list):
 
 def engine():
     categories = get_categories()
-    with open('August 20 to 23 DMU .docx', 'rb') as f:
-        all_posts = bulk_parse_document('February 29th 2024', f)
+    with open('/media/khaliq/New Volume/Documents/Python Projects/khaliq/Upwork Projects/Fizo-webapp/DMU February 5-August 19_New.docx', 'rb') as f:
+        all_posts = bulk_parse_document('August 19th 2024', f)
         # for post in all_posts[:3]:
         #     send_to_wordpress(post, categories)
         return all_posts

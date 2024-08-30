@@ -7,7 +7,7 @@ import config
 class Wp:
     def __init__(self):
         self.is_bulk = False
-        self.start_date = None
+        self.end_date = None
         self.content = None
         self.logs = 'No logs'
         self.api_value = None
@@ -22,8 +22,8 @@ class Wp:
             self.logs = '<h5>Getting the categories</h5>'
             categories = bot.get_categories()
             self.logs += '<h5>Parsing Documents</h5>'
-            all_posts = func(self.start_date, self.content)
-            self.logs += '<h5>Sending to wordpress</h5>'
+            all_posts = func(self.end_date, self.content)
+            self.logs += f'<h5>Sending to wordpress {len(all_posts)} posts</h5>'
             for idx, post in enumerate(all_posts):
                 self.logs += f'<h5>Article {idx + 1}</h5>'
                 bot.send_to_wordpress(post, categories)
@@ -43,8 +43,8 @@ class Wp:
             self.spinner.visible = True
             self.log_expander.value = True
             if self.is_bulk:
-                if self.start_date == None:
-                    self.send_notif('You must select a start date if bulk uploading', n_type='info')
+                if self.end_date == None:
+                    self.send_notif('You must select an end date if bulk uploading', n_type='info')
                 else:
                     self.engine(eval('bot.bulk_parse_document'))
             else:
@@ -100,7 +100,7 @@ class Wp:
                         on_upload=self.handle_upload).classes('w-full').props('accept=".docx" flat')
                         with ui.row(align_items='center').classes('w-full justify-around'):
                             ui.checkbox('Is Bulk Upload').bind_value(self, 'is_bulk')
-                            ui.input('Start Date').props('type="date" stack-label clearable').bind_value(self, 'start_date')
+                            ui.input('End Date').props('type="date" stack-label clearable').bind_value(self, 'end_date')
                             ui.button('Start Upload').props('unelevated').on_click(self.start_upload)
                         with ui.row().classes('w-full'):
                             with ui.expansion('Uploading Logs', icon='info')\
