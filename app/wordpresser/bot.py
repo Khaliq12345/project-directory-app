@@ -14,11 +14,13 @@ from dateparser import parse
 from datetime import timedelta
 import bot_static
 
+
 tag_dict = {
     'economic_586': [x.strip() for x in bot_static.economic.split(',')],
     'monetary policy_587': [x.strip() for x in bot_static.monetary_policy.split(',')],
     'political_588': [x.strip() for x in bot_static.political.split(',')]
 }
+
 
 def get_tags(text):
     tags = []
@@ -28,6 +30,7 @@ def get_tags(text):
                 tags.append(x.split('_')[-1])
     tags = list(set(tags))
     return tags
+
 
 def get_categories():
     print(f'Getting Categories')
@@ -46,6 +49,7 @@ def get_categories():
         num += 1
     return categories
 
+
 def get_country_id(c_name, categories: list):
     c_name = 'The Philippines' if c_name == 'Philippines' else c_name
     c_name = 'The Dominican Republic' if c_name == 'Dominican Republic' else c_name
@@ -58,6 +62,7 @@ def get_country_id(c_name, categories: list):
         if x['name'].lower() in c_name.lower():
             return str(x['id'])
 
+
 def save_data(country, title, text, date, all_posts: list):
     all_posts.append({
         'categories': country,
@@ -66,6 +71,7 @@ def save_data(country, title, text, date, all_posts: list):
         'date': date,
         'tags': get_tags(text)
     })
+
 
 def parse_text_into_countries(text, date, all_posts: list):
     places = find_countries(text, is_ignore_case=True)
@@ -88,38 +94,54 @@ def parse_text_into_countries(text, date, all_posts: list):
             countries.remove(x)
     if len(countries) > 0:
         save_data(countries, countries[0], text, date, all_posts)
-        
-def bulk_parse_document(end_date: str, content):
+  
+  
+def update_date(date: str, index_number: int) -> str:
+    #get the date based on the current index number and the starting date
+    date_str = (timedelta(index_number) + parse(date))
+    if date_str.isoweekday() == 6: #if saturday change to friday
+        print('it is saturday') 
+        index_number += 2
+        date_str = (timedelta(index_number) + parse(date))
+    elif date_str.isoweekday() == 7: #if sunday change to friday
+        print('it is sunday') 
+        index_number += 1
+        date_str = (timedelta(index_number) + parse(date))
+    index_number += 1 #add one for the next day (this will be applied on the next day)
+    date_str = date_str.strftime('%Y-%m-%dT%H:%M:%S')
+    
+    return date_str, index_number
+
+
+def to_ignore_parargraph(paragraph_value, to_ignores: list[str]):
+    #tg -> to_ignore, tgs -> to_ignores
+    x_value = paragraph_value.text
+    check_if_to_ignore = lambda tg: \
+    (tg.lower() in x_value.lower()) or (len(x_value) < 10) or (x_value.isspace())
+    results = list(filter(check_if_to_ignore, to_ignores))
+    if results:
+        return True
+    else:
+        return False
+
+
+def bulk_parse_document(start_date: str, f_content):
     print(f'Parsing document')
-    all_posts = []
-    to_ignores = ["IN CIS:", "IN ASIA:", "IN MEA:", "IN LATAM:", "Good morning – Time for the daily market update"]
-    num = 0
-    document = Document(content)
-    paragraphs = document.paragraphs
-    paragraphs.reverse()
-    for x in paragraphs:
-        if num == 0:
-            date_str = (timedelta(num) + parse(end_date))
-            date_str = date_str.strftime('%Y-%m-%dT%H:%M:%S')
-        to_ignore = False
-        if (to_ignores[-1].lower() in x.text.lower()):
-            date_str = (timedelta(num) + parse(end_date))
-            if date_str.weekday() == 5:
-                num -= 1
-                date_str = (timedelta(num) + parse(end_date))
-            elif date_str.weekday() == 6:
-                num -= 2
-                date_str = (timedelta(num) + parse(end_date))  
-            num -= 1
-            date_str = date_str.strftime('%Y-%m-%dT%H:%M:%S')
-        for tg in to_ignores:
-            if (tg.lower() in x.text.lower()) or (len(x.text) < 10) or (x.text.isspace()):
-                to_ignore = True
-                break
-        if not to_ignore:
-            parse_text_into_countries(x.text, date_str, all_posts)
+    all_posts: list[dict] = []
+    new_day_text = "Good morning – Time for the daily market update"
+    to_ignores: list[str] = ["IN CIS:", "IN ASIA:", "IN MEA:", "IN LATAM:", "Good morning – Time for the daily market update"]
+    index_number: int = 0
+    
+    content = Document(f_content)
+    paragraphs = content.paragraphs
+    for paragraph_value in paragraphs:
+        if (new_day_text.lower() in paragraph_value.text.lower()): #New data day shows up
+            date, index_number = update_date(start_date, index_number) #Get new date
+        if not to_ignore_parargraph(paragraph_value, to_ignores): #Filter the values
+            parse_text_into_countries(paragraph_value.text, date, all_posts) #And do some parsing
     all_posts = list(unique_everseen(all_posts))
     return all_posts
+
 
 def parse_document(start_date: str, content):
     print(f'Parsing document')
@@ -138,6 +160,7 @@ def parse_document(start_date: str, content):
             parse_text_into_countries(x.text, date_str, all_posts)
     all_posts = list(unique_everseen(all_posts))
     return all_posts
+
 
 def send_to_wordpress(post_dict: list, categories_list):
     categories = [
@@ -162,10 +185,12 @@ def send_to_wordpress(post_dict: list, categories_list):
         else:
             print(json_data['categories'])
 
+
 def engine():
     categories = get_categories()
-    with open('/media/khaliq/New Volume/Documents/Python Projects/khaliq/Upwork Projects/Fizo-webapp/DMU February 5-August 19_New.docx', 'rb') as f:
-        all_posts = bulk_parse_document('August 19th 2024', f)
+    with open('/home/khaliq/Desktop/DMU Sep 17-19.docx', 'rb') as f:
+        #content = Document(f)
+        all_posts = bulk_parse_document('September 17th 2024', f)
         # for post in all_posts[:3]:
         #     send_to_wordpress(post, categories)
         return all_posts
